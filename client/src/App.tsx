@@ -7,38 +7,77 @@ interface Recipe {
 }
 
 export default function App() {
-  const [input, setInput] = useState("");
+  const [title, setTitle] = useState("");
+  const [ingredients, setIngredients] = useState([""]);
+  const [steps, setSteps] = useState([""]);
   const [parsed, setParsed] = useState<Recipe | null>(null);
   const [error, setError] = useState("");
+
+  // Assemble text in backend-expected format
+  const buildRecipeText = () => {
+    let text = `TITLE: ${title}\n`;
+    ingredients.forEach((ing) => {
+      if (ing.trim()) text += `ING: ${ing.trim()}\n`;
+    });
+    steps.forEach((step) => {
+      if (step.trim()) text += `STEP: ${step.trim()}\n`;
+    });
+    return text.trim();
+  };
 
   const handleParse = async () => {
     setError("");
     setParsed(null);
+    const text = buildRecipeText();
 
     try {
       const response = await fetch("http://localhost:3001/parse-recipe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: input }),
+        body: JSON.stringify({ text }),
       });
 
       if (!response.ok) {
         const { error } = await response.json();
-        throw new Error(error || "Failed to parse recipe");
+        throw new Error(error || "Parsing failed");
       }
 
       const data = await response.json();
       setParsed(data);
     } catch (err: any) {
-      setError(err.message || "Something went wrong");
+      setError(err.message);
     }
   };
 
-  const handleClearInput = () => {
-    setInput("");
+  const addIngredient = () => setIngredients([...ingredients, ""]);
+  const addStep = () => setSteps([...steps, ""]);
+
+  const updateIngredient = (index: number, value: string) => {
+    const updated = [...ingredients];
+    updated[index] = value;
+    setIngredients(updated);
   };
 
-  const handleClearOutput = () => {
+  const updateStep = (index: number, value: string) => {
+    const updated = [...steps];
+    updated[index] = value;
+    setSteps(updated);
+  };
+
+  const removeIngredient = (index: number) => {
+    const updated = ingredients.filter((_, i) => i !== index);
+    setIngredients(updated.length ? updated : [""]);
+  };
+
+  const removeStep = (index: number) => {
+    const updated = steps.filter((_, i) => i !== index);
+    setSteps(updated.length ? updated : [""]);
+  };
+
+  const clearAll = () => {
+    setTitle("");
+    setIngredients([""]);
+    setSteps([""]);
     setParsed(null);
     setError("");
   };
@@ -46,44 +85,98 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50 p-6 text-gray-900">
       <div className="max-w-3xl mx-auto space-y-6">
-        <h1 className="text-3xl font-bold text-blue-600">
-          📝 Recipe Text Processor & Lister
-        </h1>
+        <h1 className="text-3xl font-bold text-blue-600">📝 Recipe Text Processor & Lister</h1>
 
-        <textarea
-          className="w-full h-40 p-4 border border-gray-300 rounded-md resize-none"
-          placeholder={`Paste your recipe here...\n\nTITLE: Pancakes\nING: 2 eggs\nING: 1 cup flour\nSTEP: Mix\nSTEP: Fry`}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-        />
+        {/* Title Input */}
+        <div>
+          <label className="block font-semibold mb-1">📛 Title:</label>
+          <input
+            className="w-full p-2 border border-gray-300 rounded-md"
+            type="text"
+            placeholder="e.g. Chocolate Cake"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
 
-        <div className="flex flex-wrap gap-4">
+        {/* Ingredients Input */}
+        <div>
+          <label className="block font-semibold mb-1">🧂 Ingredients:</label>
+          {ingredients.map((ing, i) => (
+            <div key={i} className="flex gap-2 mb-2">
+              <input
+                className="flex-1 p-2 border border-gray-300 rounded-md"
+                type="text"
+                value={ing}
+                placeholder={`Ingredient ${i + 1}`}
+                onChange={(e) => updateIngredient(i, e.target.value)}
+              />
+              <button
+                className="text-red-600 font-bold"
+                onClick={() => removeIngredient(i)}
+              >
+                ✖
+              </button>
+            </div>
+          ))}
           <button
-            className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
+            className="mt-1 text-blue-600 font-semibold"
+            onClick={addIngredient}
+          >
+            ➕ Add Ingredient
+          </button>
+        </div>
+
+        {/* Steps Input */}
+        <div>
+          <label className="block font-semibold mb-1">👨‍🍳 Steps:</label>
+          {steps.map((step, i) => (
+            <div key={i} className="flex gap-2 mb-2">
+              <input
+                className="flex-1 p-2 border border-gray-300 rounded-md"
+                type="text"
+                value={step}
+                placeholder={`Step ${i + 1}`}
+                onChange={(e) => updateStep(i, e.target.value)}
+              />
+              <button
+                className="text-red-600 font-bold"
+                onClick={() => removeStep(i)}
+              >
+                ✖
+              </button>
+            </div>
+          ))}
+          <button
+            className="mt-1 text-blue-600 font-semibold"
+            onClick={addStep}
+          >
+            ➕ Add Step
+          </button>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-4 mt-4">
+          <button
+            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
             onClick={handleParse}
           >
             Parse Recipe
           </button>
-
           <button
-            className="bg-gray-300 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-400"
-            onClick={handleClearInput}
+            className="bg-gray-400 text-white px-6 py-2 rounded hover:bg-gray-500"
+            onClick={clearAll}
           >
-            Clear Input
-          </button>
-
-          <button
-            className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600"
-            onClick={handleClearOutput}
-          >
-            Clear Output
+            Clear All
           </button>
         </div>
 
+        {/* Error Message */}
         {error && <div className="text-red-600 font-semibold">{error}</div>}
 
+        {/* Parsed Result */}
         {parsed && (
-          <div className="bg-white p-4 shadow-md rounded-md">
+          <div className="bg-white p-4 shadow-md rounded-md mt-6">
             <h2 className="text-2xl font-semibold mb-2 text-green-600">
               {parsed.title}
             </h2>
