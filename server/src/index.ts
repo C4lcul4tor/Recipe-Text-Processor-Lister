@@ -55,3 +55,5 @@ app.post("/parse-recipe", (req: Request, res: Response) => {
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
 });
+import recipeRoutes from "./routes/recipes";
+app.use("/recipes", recipeRoutes);

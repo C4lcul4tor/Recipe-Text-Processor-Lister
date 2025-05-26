@@ -1,0 +1,24 @@
+[
+  {
+    "id": "368304e6-3cfc-416a-b3a6-d145113237fc",
+    "title": "Cake",
+    "ingredients": [
+      "Water",
+      "2 Eggs"
+    ],
+    "steps": [
+      "Mix"
+    ]
+  },
+  {
+    "id": "38b770ad-934e-44e0-983b-191a5fd371af",
+    "title": "Protein Shake",
+    "ingredients": [
+      "Water",
+      "1 cup Protein"
+    ],
+    "steps": [
+      "Mix"
+    ]
+  }
+]
