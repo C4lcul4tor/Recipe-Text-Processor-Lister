@@ -18,9 +18,7 @@ export default function App() {
     try {
       const response = await fetch("http://localhost:3001/parse-recipe", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: input }),
       });
 
@@ -34,6 +32,15 @@ export default function App() {
     } catch (err: any) {
       setError(err.message || "Something went wrong");
     }
+  };
+
+  const handleClearInput = () => {
+    setInput("");
+  };
+
+  const handleClearOutput = () => {
+    setParsed(null);
+    setError("");
   };
 
   return (
@@ -50,16 +57,30 @@ export default function App() {
           onChange={(e) => setInput(e.target.value)}
         />
 
-        <button
-          className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
-          onClick={handleParse}
-        >
-          Parse Recipe
-        </button>
+        <div className="flex flex-wrap gap-4">
+          <button
+            className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
+            onClick={handleParse}
+          >
+            Parse Recipe
+          </button>
 
-        {error && (
-          <div className="text-red-600 font-semibold">{error}</div>
-        )}
+          <button
+            className="bg-gray-300 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-400"
+            onClick={handleClearInput}
+          >
+            Clear Input
+          </button>
+
+          <button
+            className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600"
+            onClick={handleClearOutput}
+          >
+            Clear Output
+          </button>
+        </div>
+
+        {error && <div className="text-red-600 font-semibold">{error}</div>}
 
         {parsed && (
           <div className="bg-white p-4 shadow-md rounded-md">
