@@ -12,8 +12,8 @@ export default function App() {
   const [steps, setSteps] = useState([""]);
   const [parsed, setParsed] = useState<Recipe | null>(null);
   const [error, setError] = useState("");
+  const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([]);
 
-  // Assemble text in backend-expected format
   const buildRecipeText = () => {
     let text = `TITLE: ${title}\n`;
     ingredients.forEach((ing) => {
@@ -82,6 +82,25 @@ export default function App() {
     setError("");
   };
 
+  const saveParsedRecipe = () => {
+    if (parsed) {
+      setSavedRecipes([...savedRecipes, parsed]);
+    }
+  };
+
+  const loadRecipe = (recipe: Recipe) => {
+    setTitle(recipe.title);
+    setIngredients(recipe.ingredients);
+    setSteps(recipe.steps);
+    setParsed(recipe);
+  };
+
+  const removeSavedRecipe = (index: number) => {
+    const updated = [...savedRecipes];
+    updated.splice(index, 1);
+    setSavedRecipes(updated);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-6 text-gray-900">
       <div className="max-w-3xl mx-auto space-y-6">
@@ -89,7 +108,7 @@ export default function App() {
 
         {/* Title Input */}
         <div>
-          <label className="block font-semibold mb-1">📛 Title:</label>
+          <label className="block font-semibold mb-1">💗 Title:</label>
           <input
             className="w-full p-2 border border-gray-300 rounded-md"
             type="text"
@@ -112,7 +131,7 @@ export default function App() {
                 onChange={(e) => updateIngredient(i, e.target.value)}
               />
               <button
-                className="text-red-600 font-bold"
+                className="text-purple-600 font-bold"
                 onClick={() => removeIngredient(i)}
               >
                 ✖
@@ -140,7 +159,7 @@ export default function App() {
                 onChange={(e) => updateStep(i, e.target.value)}
               />
               <button
-                className="text-red-600 font-bold"
+                className="text-purple-600 font-bold"
                 onClick={() => removeStep(i)}
               >
                 ✖
@@ -156,7 +175,7 @@ export default function App() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-4 mt-4">
+        <div className="flex gap-4 mt-4 flex-wrap">
           <button
             className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
             onClick={handleParse}
@@ -169,6 +188,14 @@ export default function App() {
           >
             Clear All
           </button>
+          {parsed && (
+            <button
+              className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+              onClick={saveParsedRecipe}
+            >
+              💾 Save Recipe
+            </button>
+          )}
         </div>
 
         {/* Error Message */}
@@ -177,10 +204,7 @@ export default function App() {
         {/* Parsed Result */}
         {parsed && (
           <div className="bg-white p-4 shadow-md rounded-md mt-6">
-            <h2 className="text-2xl font-semibold mb-2 text-green-600">
-              {parsed.title}
-            </h2>
-
+            <h2 className="text-2xl font-semibold mb-2 text-green-600">{parsed.title}</h2>
             <div className="mb-4">
               <h3 className="font-semibold">🧂 Ingredients:</h3>
               <ul className="list-disc list-inside">
@@ -189,7 +213,6 @@ export default function App() {
                 ))}
               </ul>
             </div>
-
             <div>
               <h3 className="font-semibold">👨‍🍳 Steps:</h3>
               <ol className="list-decimal list-inside">
@@ -198,6 +221,37 @@ export default function App() {
                 ))}
               </ol>
             </div>
+          </div>
+        )}
+
+        {/* Saved Recipes */}
+        {savedRecipes.length > 0 && (
+          <div className="mt-10">
+            <h2 className="text-xl font-bold mb-2">📚 Saved Recipes</h2>
+            <ul className="space-y-2">
+              {savedRecipes.map((recipe, index) => (
+                <li
+                  key={index}
+                  className="flex justify-between items-center bg-white p-3 shadow-sm rounded-md"
+                >
+                  <span className="font-medium text-gray-800">{recipe.title}</span>
+                  <div className="space-x-3">
+                    <button
+                      className="text-blue-600 hover:underline"
+                      onClick={() => loadRecipe(recipe)}
+                    >
+                      View
+                    </button>
+                    <button
+                      className="text-red-600 hover:underline"
+                      onClick={() => removeSavedRecipe(index)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
       </div>
