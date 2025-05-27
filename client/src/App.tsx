@@ -5,18 +5,14 @@ interface Recipe {
   title: string;
   ingredients: string[];
   steps: string[];
-  tags?: string[];
 }
 
 export default function App() {
   const [title, setTitle] = useState("");
   const [ingredients, setIngredients] = useState([""]);
   const [steps, setSteps] = useState([""]);
-  const [tagInput, setTagInput] = useState("");
-  const [tags, setTags] = useState<string[]>([]);
   const [parsed, setParsed] = useState<Recipe | null>(null);
   const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([]);
-  const [error, setError] = useState("");
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -34,7 +30,13 @@ export default function App() {
   };
 
   const handleParse = async () => {
+    if (!title.trim() || ingredients.some(i => !i.trim()) || steps.some(s => !s.trim())) {
+      alert("Please fill in all fields before parsing.");
+      return;
+    }
+
     const text = `TITLE: ${title}\n${ingredients.map(i => `ING: ${i}`).join("\n")}\n${steps.map(s => `STEP: ${s}`).join("\n")}`;
+
     try {
       const res = await fetch("http://localhost:3001/parse-recipe", {
         method: "POST",
@@ -42,9 +44,9 @@ export default function App() {
         body: JSON.stringify({ text }),
       });
       const data = await res.json();
-      setParsed({ ...data, tags });
+      setParsed(data);
     } catch (err: any) {
-      setError(err.message);
+      alert("Parsing failed.");
     }
   };
 
@@ -58,6 +60,7 @@ export default function App() {
       });
       const data = await res.json();
       setSavedRecipes([...savedRecipes, data]);
+      clearAll();
     } catch (err) {
       console.error("Save failed", err);
     }
@@ -84,25 +87,14 @@ export default function App() {
     copy[i] = val;
     setSteps(copy);
   };
-
   const removeIngredient = (i: number) => setIngredients(ingredients.filter((_, idx) => idx !== i));
   const removeStep = (i: number) => setSteps(steps.filter((_, idx) => idx !== i));
-  const addTag = () => {
-    if (tagInput.trim() && !tags.includes(tagInput.trim())) {
-      setTags([...tags, tagInput.trim()]);
-    }
-    setTagInput("");
-  };
-  const removeTag = (tag: string) => setTags(tags.filter(t => t !== tag));
-
   const clearAll = () => {
     setTitle("");
     setIngredients([""]);
     setSteps([""]);
-    setTags([]);
     setParsed(null);
   };
-
   const copyText = (text: string) => {
     navigator.clipboard.writeText(text);
     alert("Copied to clipboard!");
@@ -117,7 +109,6 @@ export default function App() {
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold text-blue-600 mb-4">📝 Recipe Text Processor & Lister</h1>
 
-        {/* FORM */}
         <div className="bg-white rounded-xl shadow p-4 mb-8">
           <div className="mb-4">
             <label className="block font-semibold">💗 Title</label>
@@ -146,21 +137,6 @@ export default function App() {
             <button onClick={addStep} className="text-blue-500 font-semibold">➕ Add Step</button>
           </div>
 
-          <div className="mb-4">
-            <label className="block font-semibold">🏷 Tags</label>
-            <div className="flex gap-2 mb-2">
-              <input value={tagInput} onChange={e => setTagInput(e.target.value)} className="border p-2 rounded" />
-              <button onClick={addTag} className="text-green-600 font-semibold">Add</button>
-            </div>
-            <div className="flex gap-2 flex-wrap">
-              {tags.map((tag, i) => (
-                <span key={i} className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-sm">
-                  {tag} <button onClick={() => removeTag(tag)}>✖</button>
-                </span>
-              ))}
-            </div>
-          </div>
-
           <div className="flex gap-4 mt-4">
             <button onClick={handleParse} className="bg-blue-600 text-white px-4 py-2 rounded">Parse</button>
             <button onClick={clearAll} className="bg-gray-400 text-white px-4 py-2 rounded">Clear</button>
@@ -170,7 +146,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* SEARCH */}
         <div className="mb-6">
           <input
             placeholder="🔍 Search recipes..."
@@ -180,7 +155,6 @@ export default function App() {
           />
         </div>
 
-        {/* RECIPES */}
         <div className="grid md:grid-cols-2 gap-6">
           {filteredRecipes.map((r) => (
             <div key={r.id} className="bg-white p-4 rounded-lg shadow-md space-y-3">
@@ -191,14 +165,6 @@ export default function App() {
                   <button onClick={() => deleteRecipe(r.id!)} className="text-sm text-red-600 hover:underline">🗑 Delete</button>
                 </div>
               </div>
-
-              {r.tags?.length && (
-                <div className="flex gap-2 flex-wrap">
-                  {r.tags.map((tag, i) => (
-                    <span key={i} className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">{tag}</span>
-                  ))}
-                </div>
-              )}
 
               <div>
                 <h3 className="font-semibold">🧂 Ingredients:</h3>

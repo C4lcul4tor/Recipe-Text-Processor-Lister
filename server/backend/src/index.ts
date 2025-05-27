@@ -1,1 +1,3 @@
-"// Entry point for backend" 
+import recipeRoutes from "../controllers/recipes";
+
+app.use("/recipes", recipeRoutes);

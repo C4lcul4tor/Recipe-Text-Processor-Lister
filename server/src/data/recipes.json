@@ -1,40 +1,12 @@
 [
   {
-    "id": "368304e6-3cfc-416a-b3a6-d145113237fc",
-    "title": "Cake",
+    "id": "6ce13a57-4f58-4db3-897a-bde253555851",
+    "title": "dasdasd",
     "ingredients": [
-      "Water",
-      "2 Eggs"
+      "asdasd"
     ],
     "steps": [
-      "Mix"
-    ]
-  },
-  {
-    "id": "38b770ad-934e-44e0-983b-191a5fd371af",
-    "title": "Protein Shake",
-    "ingredients": [
-      "Water",
-      "1 cup Protein"
-    ],
-    "steps": [
-      "Mix"
-    ]
-  },
-  {
-    "id": "95dbbb92-f85b-4cea-a355-5ae179089829",
-    "title": "Oats Breakfast",
-    "ingredients": [
-      "50g Oats",
-      "1 Banana",
-      "Cocoa",
-      "Boiled Water"
-    ],
-    "steps": [
-      "Add Water to Oats",
-      "Leave it 5 min",
-      "Add banana",
-      "Add Cocoa"
+      "asdda"
     ]
   }
 ]
