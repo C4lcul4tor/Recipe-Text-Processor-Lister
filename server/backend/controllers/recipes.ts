@@ -6,12 +6,14 @@ import { v4 as uuidv4 } from "uuid";
 const router = Router();
 const dataPath = path.join(__dirname, "../../../data/recipes.json");
 
+// Load recipes from JSON file
 const loadRecipes = () => {
   if (!fs.existsSync(dataPath)) return [];
   const raw = fs.readFileSync(dataPath, "utf-8");
   return JSON.parse(raw);
 };
 
+// Save recipes to JSON file
 const saveRecipes = (recipes: any[]) => {
   fs.writeFileSync(dataPath, JSON.stringify(recipes, null, 2));
 };
@@ -38,10 +40,10 @@ router.post("/", (req: Request, res: Response) => {
   res.status(201).json(newRecipe);
 });
 
-// DELETE recipe by ID
+// DELETE recipe by ID (with 'r: any' fix)
 router.delete("/:id", (req: Request, res: Response) => {
   const recipes = loadRecipes();
-  const updated = recipes.filter(r => r.id !== req.params.id);
+  const updated = recipes.filter((r: any) => r.id !== req.params.id);
 
   if (recipes.length === updated.length) {
     return res.status(404).json({ error: "Recipe not found" });
