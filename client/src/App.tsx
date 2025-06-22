@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import ShoppingList from "./ShoppingList"; 
 import RecipeStats from "./RecipeStats";
+import MiniGame from "./MiniGame";
 interface Recipe {
   id?: string;
   title: string;
@@ -9,6 +10,7 @@ interface Recipe {
 }
 
 export default function App() {
+  const [gameDone, setGameDone] = useState(false);
   const [title, setTitle] = useState("");
   const [ingredients, setIngredients] = useState([""]);
   const [steps, setSteps] = useState([""]);
@@ -162,8 +164,13 @@ ${recipe.steps.map((s, idx) => `${idx + 1}. ${s}`).join("\n")}
   const filteredRecipes = savedRecipes.filter(r =>
     r.title.toLowerCase().includes(search.toLowerCase())
   );
+if (!gameDone) {
+  return <MiniGame onGameComplete={() => setGameDone(true)} />;
+}
+
 
   return (
+    
     <div className="min-h-screen bg-gray-50 text-gray-800 p-6">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold text-blue-600 mb-4">📝 Recipe Text Processor & Lister</h1>
