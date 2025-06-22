@@ -129,6 +129,35 @@ export default function App() {
     }
   };
 
+  const exportAsJson = (recipe: Recipe) => {
+    const blob = new Blob([JSON.stringify(recipe, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${recipe.title.replace(/\s+/g, "_")}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportAsPdf = (recipe: Recipe) => {
+    const text = `
+📋 Title: ${recipe.title}
+
+🧂 Ingredients:
+${recipe.ingredients.map((i) => `- ${i}`).join("\n")}
+
+👨‍🍳 Steps:
+${recipe.steps.map((s, idx) => `${idx + 1}. ${s}`).join("\n")}
+    `;
+    const blob = new Blob([text], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${recipe.title.replace(/\s+/g, "_")}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const filteredRecipes = savedRecipes.filter(r =>
     r.title.toLowerCase().includes(search.toLowerCase())
   );
@@ -175,7 +204,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* Parsed Recipe Preview */}
         {parsed && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-8">
             <h2 className="text-lg font-bold mb-2">📋 Parsed Recipe Preview</h2>
@@ -187,7 +215,6 @@ export default function App() {
           </div>
         )}
 
-        {/* AI Assistant */}
         <div className="bg-white rounded-xl shadow p-4 mb-8">
           <h2 className="text-lg font-bold mb-2">🧠 Ask the AI</h2>
           <div className="flex gap-2 mb-2">
@@ -221,10 +248,11 @@ export default function App() {
                 <h2 className="text-xl font-bold text-green-700">{r.title}</h2>
                 <div className="space-x-3">
                   <button onClick={() => copyText(r.ingredients.join(", "))} className="text-sm text-blue-600 hover:underline">📋 Copy Ingredients</button>
+                  <button onClick={() => exportAsJson(r)} className="text-sm text-indigo-600 hover:underline">🧾 JSON</button>
+                  <button onClick={() => exportAsPdf(r)} className="text-sm text-purple-600 hover:underline">📄 PDF</button>
                   <button onClick={() => deleteRecipe(r.id!)} className="text-sm text-red-600 hover:underline">🗑 Delete</button>
                 </div>
               </div>
-
               <div>
                 <h3 className="font-semibold">🧂 Ingredients:</h3>
                 <ul className="list-disc list-inside text-sm">
