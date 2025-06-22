@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import ShoppingList from "./ShoppingList"; // ✅ added
-
+import ShoppingList from "./ShoppingList"; 
+import RecipeStats from "./RecipeStats";
 interface Recipe {
   id?: string;
   title: string;
@@ -265,6 +265,8 @@ ${recipe.steps.map((s, idx) => `${idx + 1}. ${s}`).join("\n")}
             </div>
           ))}
         </div>
+           {/* ✅ New: Recipe Statistics Panel */}
+        <RecipeStats recipes={savedRecipes} />
 
         {/* ✅ Shopping List Panel */}
         <ShoppingList />
