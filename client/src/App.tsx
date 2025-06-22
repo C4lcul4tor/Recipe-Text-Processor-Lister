@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ShoppingList from "./ShoppingList"; // ✅ added
 
 interface Recipe {
   id?: string;
@@ -167,33 +168,28 @@ ${recipe.steps.map((s, idx) => `${idx + 1}. ${s}`).join("\n")}
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold text-blue-600 mb-4">📝 Recipe Text Processor & Lister</h1>
 
+        {/* Input Fields */}
         <div className="bg-white rounded-xl shadow p-4 mb-8">
-          <div className="mb-4">
-            <label className="block font-semibold">💗 Title</label>
-            <input value={title} onChange={e => setTitle(e.target.value)} className="w-full border p-2 rounded" />
-          </div>
+          <label className="block font-semibold mb-1">💗 Title</label>
+          <input value={title} onChange={e => setTitle(e.target.value)} className="w-full border p-2 rounded mb-4" />
 
-          <div className="mb-4">
-            <label className="block font-semibold">🧂 Ingredients</label>
-            {ingredients.map((ing, i) => (
-              <div key={i} className="flex gap-2 mb-2">
-                <input value={ing} onChange={e => updateIngredient(i, e.target.value)} className="flex-1 border p-2 rounded" />
-                <button onClick={() => removeIngredient(i)} className="text-red-500 font-bold">✖</button>
-              </div>
-            ))}
-            <button onClick={addIngredient} className="text-blue-500 font-semibold">➕ Add Ingredient</button>
-          </div>
+          <label className="block font-semibold mb-1">🧂 Ingredients</label>
+          {ingredients.map((ing, i) => (
+            <div key={i} className="flex gap-2 mb-2">
+              <input value={ing} onChange={e => updateIngredient(i, e.target.value)} className="flex-1 border p-2 rounded" />
+              <button onClick={() => removeIngredient(i)} className="text-red-500 font-bold">✖</button>
+            </div>
+          ))}
+          <button onClick={addIngredient} className="text-blue-500 font-semibold mb-4">➕ Add Ingredient</button>
 
-          <div className="mb-4">
-            <label className="block font-semibold">👨‍🍳 Steps</label>
-            {steps.map((step, i) => (
-              <div key={i} className="flex gap-2 mb-2">
-                <input value={step} onChange={e => updateStep(i, e.target.value)} className="flex-1 border p-2 rounded" />
-                <button onClick={() => removeStep(i)} className="text-red-500 font-bold">✖</button>
-              </div>
-            ))}
-            <button onClick={addStep} className="text-blue-500 font-semibold">➕ Add Step</button>
-          </div>
+          <label className="block font-semibold mb-1">👨‍🍳 Steps</label>
+          {steps.map((step, i) => (
+            <div key={i} className="flex gap-2 mb-2">
+              <input value={step} onChange={e => updateStep(i, e.target.value)} className="flex-1 border p-2 rounded" />
+              <button onClick={() => removeStep(i)} className="text-red-500 font-bold">✖</button>
+            </div>
+          ))}
+          <button onClick={addStep} className="text-blue-500 font-semibold mb-4">➕ Add Step</button>
 
           <div className="flex gap-4 mt-4">
             <button onClick={handleParse} className="bg-blue-600 text-white px-4 py-2 rounded">Parse</button>
@@ -207,14 +203,13 @@ ${recipe.steps.map((s, idx) => `${idx + 1}. ${s}`).join("\n")}
         {parsed && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-8">
             <h2 className="text-lg font-bold mb-2">📋 Parsed Recipe Preview</h2>
-            <div className="space-y-2">
-              <div><strong>Title:</strong> {parsed.title}</div>
-              <div><strong>Ingredients:</strong> {parsed.ingredients.join(", ")}</div>
-              <div><strong>Steps:</strong> {parsed.steps.join(" → ")}</div>
-            </div>
+            <p><strong>Title:</strong> {parsed.title}</p>
+            <p><strong>Ingredients:</strong> {parsed.ingredients.join(", ")}</p>
+            <p><strong>Steps:</strong> {parsed.steps.join(" → ")}</p>
           </div>
         )}
 
+        {/* AI */}
         <div className="bg-white rounded-xl shadow p-4 mb-8">
           <h2 className="text-lg font-bold mb-2">🧠 Ask the AI</h2>
           <div className="flex gap-2 mb-2">
@@ -232,6 +227,7 @@ ${recipe.steps.map((s, idx) => `${idx + 1}. ${s}`).join("\n")}
           )}
         </div>
 
+        {/* Search */}
         <div className="mb-6">
           <input
             placeholder="🔍 Search recipes..."
@@ -241,13 +237,14 @@ ${recipe.steps.map((s, idx) => `${idx + 1}. ${s}`).join("\n")}
           />
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        {/* Saved Recipes */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
           {filteredRecipes.map((r) => (
             <div key={r.id} className="bg-white p-4 rounded-lg shadow-md space-y-3">
               <div className="flex justify-between items-center">
                 <h2 className="text-xl font-bold text-green-700">{r.title}</h2>
-                <div className="space-x-3">
-                  <button onClick={() => copyText(r.ingredients.join(", "))} className="text-sm text-blue-600 hover:underline">📋 Copy Ingredients</button>
+                <div className="space-x-2">
+                  <button onClick={() => copyText(r.ingredients.join(", "))} className="text-sm text-blue-600 hover:underline">📋 Copy</button>
                   <button onClick={() => exportAsJson(r)} className="text-sm text-indigo-600 hover:underline">🧾 JSON</button>
                   <button onClick={() => exportAsPdf(r)} className="text-sm text-purple-600 hover:underline">📄 PDF</button>
                   <button onClick={() => deleteRecipe(r.id!)} className="text-sm text-red-600 hover:underline">🗑 Delete</button>
@@ -268,6 +265,9 @@ ${recipe.steps.map((s, idx) => `${idx + 1}. ${s}`).join("\n")}
             </div>
           ))}
         </div>
+
+        {/* ✅ Shopping List Panel */}
+        <ShoppingList />
       </div>
     </div>
   );

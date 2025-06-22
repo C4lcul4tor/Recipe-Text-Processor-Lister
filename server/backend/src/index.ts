@@ -3,7 +3,10 @@ import cors from "cors";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import fetch from "node-fetch";
+import fs from "fs";
+import path from "path";
 import 'dotenv/config';
+import shoppingListRoutes from "./routes/shoppingList";
 
 dotenv.config();
 
@@ -12,6 +15,15 @@ const PORT = 3001;
 
 app.use(cors());
 app.use(bodyParser.json());
+
+// ✅ Ensure shopping_list.json exists
+const shoppingDataPath = path.join(__dirname, "../../data/shopping_list.json");
+if (!fs.existsSync(shoppingDataPath)) {
+  fs.writeFileSync(shoppingDataPath, JSON.stringify([]));
+}
+
+// ✅ Mount the shopping list API route
+app.use("/shopping-list", shoppingListRoutes);
 
 // Recipe interface
 interface Recipe {
@@ -51,13 +63,12 @@ app.delete("/recipes/:id", (req: express.Request, res: express.Response) => {
 // Parse recipe endpoint
 app.post("/parse-recipe", (req: express.Request, res: express.Response) => {
   const { text } = req.body;
-  
-  // Simple parsing logic - extract title, ingredients, and steps
+
   const lines: string[] = text.split('\n');
   let title = '';
   const ingredients: string[] = [];
   const steps: string[] = [];
-  
+
   lines.forEach((line: string) => {
     if (line.startsWith('TITLE:')) {
       title = line.replace('TITLE:', '').trim();
@@ -67,7 +78,7 @@ app.post("/parse-recipe", (req: express.Request, res: express.Response) => {
       steps.push(line.replace('STEP:', '').trim());
     }
   });
-  
+
   res.json({ title, ingredients, steps });
 });
 
@@ -99,8 +110,8 @@ app.post("/ai", async (req: express.Request, res: express.Response) => {
 
     if (!response.ok) {
       console.error("OpenRouter API error:", data);
-      return res.status(response.status).json({ 
-        error: data.error?.message || data.error || "AI request failed" 
+      return res.status(response.status).json({
+        error: data.error?.message || data.error || "AI request failed"
       });
     }
 
