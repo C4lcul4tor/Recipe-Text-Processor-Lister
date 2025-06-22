@@ -236,6 +236,21 @@ ${recipe.steps.map((s, idx) => `${idx + 1}. ${s}`).join("\n")}
             className="w-full border p-2 rounded"
           />
         </div>
+{/* Recently Added Recipes */}
+{savedRecipes.length > 0 && (
+  <div className="mb-8">
+    <h2 className="text-lg font-semibold mb-2 text-blue-700">🗓️ Recently Added</h2>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {savedRecipes.slice(-3).reverse().map((r) => (
+        <div key={r.id} className="bg-white p-3 rounded shadow text-sm">
+          <h3 className="font-bold text-green-700">{r.title}</h3>
+          <p><strong>Ingredients:</strong> {r.ingredients.slice(0, 2).join(", ")}{r.ingredients.length > 2 ? "..." : ""}</p>
+          <p><strong>Steps:</strong> {r.steps.length} step(s)</p>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
 
         {/* Saved Recipes */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
